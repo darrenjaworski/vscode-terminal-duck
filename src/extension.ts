@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { CapturedExecution, formatExecutions } from './format';
+import { CapturedExecution, clampLimit, formatExecutions } from './format';
+import { systemPromptFor } from './prompts';
 
 const MAX_HISTORY = 20;
 const MAX_OUTPUT_BYTES = 8_000;
@@ -64,12 +65,6 @@ class ShellHistory {
 	}
 }
 
-const SYSTEM_PROMPT = `You are Duck, a rubber-duck debugging assistant for a developer working in VS Code.
-You have access to the real commands the user just ran in their integrated terminal, along with exit codes and captured output.
-When the user asks a question, ground your answer in the actual terminal history when relevant — cite the specific command and exit code.
-If no commands are relevant, say so and answer from general knowledge.
-Be concise. Lead with the most likely cause of any failure, then suggest one concrete next step.`;
-
 async function handleChat(
 	history: ShellHistory,
 	request: vscode.ChatRequest,
@@ -93,7 +88,7 @@ async function handleChat(
 	}
 
 	const messages: vscode.LanguageModelChatMessage[] = [
-		vscode.LanguageModelChatMessage.User(SYSTEM_PROMPT),
+		vscode.LanguageModelChatMessage.User(systemPromptFor(request.command)),
 		vscode.LanguageModelChatMessage.User(
 			`Recent terminal activity:\n\n${formatExecutions(executions)}`,
 		),
@@ -130,6 +125,24 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('terminal-duck.clearHistory', () => {
 			history.clear();
 			vscode.window.showInformationMessage('Terminal Duck: shell history cleared.');
+		}),
+	);
+
+	context.subscriptions.push(
+		vscode.lm.registerTool<{ limit?: number }>('terminal-duck_getRecentCommands', {
+			async invoke(options) {
+				const limit = clampLimit(options.input?.limit, MAX_CONTEXT_EXECUTIONS, MAX_HISTORY);
+				const executions = history.recent(limit);
+				return new vscode.LanguageModelToolResult([
+					new vscode.LanguageModelTextPart(formatExecutions(executions)),
+				]);
+			},
+			async prepareInvocation(options) {
+				const limit = clampLimit(options.input?.limit, MAX_CONTEXT_EXECUTIONS, MAX_HISTORY);
+				return {
+					invocationMessage: `Fetching the last ${limit} terminal command${limit === 1 ? '' : 's'}`,
+				};
+			},
 		}),
 	);
 }

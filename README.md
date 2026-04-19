@@ -24,6 +24,26 @@ Example prompts:
 - `@duck the last command hung — what should I try?`
 - `@duck I ran three things, give me a summary`
 
+## Slash commands
+
+| Command          | What it does                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| `@duck /fix`     | Finds the most recent failing command and proposes a single concrete fix.                     |
+| `@duck /rerun`   | Suggests the next command to run — retry with different flags, or the natural follow-up step. |
+| `@duck /explain` | Explains what the most recent command did and what its output means.                          |
+
+## Use from other agents (Language Model Tool)
+
+Terminal Duck also registers a `#duck` tool via the `lm.tools` API. Any chat participant or Copilot agent-mode session can call it to fetch your recent terminal activity.
+
+In Copilot Chat, reference it explicitly with `#duck` to include recent commands in the prompt:
+
+```
+#duck why might the test runner be picking up the wrong config?
+```
+
+Agents can invoke `terminal-duck_getRecentCommands` programmatically; accepts an optional `limit` (1–20, default 6).
+
 ## Commands
 
 | Command                                       | Description                         |

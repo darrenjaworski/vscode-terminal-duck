@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { stripAnsi, formatExecutions, CapturedExecution } from './format';
+import { stripAnsi, formatExecutions, clampLimit, CapturedExecution } from './format';
 
 describe('stripAnsi', () => {
 	it('removes colour escape sequences', () => {
@@ -60,5 +60,32 @@ describe('formatExecutions', () => {
 		const out = formatExecutions([exec]);
 		expect(out).toContain('hi');
 		expect(out).not.toContain('\x1b');
+	});
+});
+
+describe('clampLimit', () => {
+	it('returns the fallback when requested is undefined', () => {
+		expect(clampLimit(undefined, 6, 20)).toBe(6);
+	});
+
+	it('returns the fallback when requested is NaN', () => {
+		expect(clampLimit(Number.NaN, 6, 20)).toBe(6);
+	});
+
+	it('caps values above the max', () => {
+		expect(clampLimit(500, 6, 20)).toBe(20);
+	});
+
+	it('raises values at or below zero to 1', () => {
+		expect(clampLimit(0, 6, 20)).toBe(1);
+		expect(clampLimit(-3, 6, 20)).toBe(1);
+	});
+
+	it('floors fractional values', () => {
+		expect(clampLimit(7.9, 6, 20)).toBe(7);
+	});
+
+	it('passes through in-range integers', () => {
+		expect(clampLimit(10, 6, 20)).toBe(10);
 	});
 });

@@ -2,6 +2,7 @@
 .github/**
 .vscode/**
 .vscode-test/**
+.claude/**
 .gitignore
 .prettierignore
 .prettierrc.json

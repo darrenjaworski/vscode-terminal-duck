@@ -7,6 +7,11 @@ export interface CapturedExecution {
 	output: string;
 }
 
+export function clampLimit(requested: number | undefined, fallback: number, max: number): number {
+	if (requested === undefined || Number.isNaN(requested)) return fallback;
+	return Math.min(Math.max(1, Math.floor(requested)), max);
+}
+
 export function stripAnsi(s: string): string {
 	// eslint-disable-next-line no-control-regex -- ESC (0x1b) is the whole point of ANSI stripping
 	return s.replace(/\x1b\[[0-9;?]*[ -/]*[@-~]/g, '');

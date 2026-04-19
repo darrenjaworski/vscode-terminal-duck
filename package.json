@@ -34,13 +34,53 @@
         "name": "duck",
         "fullName": "Terminal Duck",
         "description": "Ask about the commands you just ran in the terminal.",
-        "isSticky": true
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "fix",
+            "description": "Propose a fix for the most recent failed command"
+          },
+          {
+            "name": "rerun",
+            "description": "Suggest the next command to run"
+          },
+          {
+            "name": "explain",
+            "description": "Explain what the most recent command did"
+          }
+        ]
       }
     ],
     "commands": [
       {
         "command": "terminal-duck.clearHistory",
         "title": "Terminal Duck: Clear captured shell history"
+      }
+    ],
+    "languageModelTools": [
+      {
+        "name": "terminal-duck_getRecentCommands",
+        "displayName": "Get recent terminal commands",
+        "modelDescription": "Returns the user's most recent integrated-terminal commands with their working directory, exit code, and captured output. Call this when you need to understand what the user just ran to diagnose a failure or answer a question about their local environment.",
+        "userDescription": "Lets other chat participants and agents see what you ran in the integrated terminal.",
+        "canBeReferencedInPrompt": true,
+        "toolReferenceName": "duck",
+        "icon": "$(debug-console)",
+        "tags": [
+          "terminal",
+          "diagnostics"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "number",
+              "description": "Maximum number of recent commands to return. Defaults to 6, capped at 20.",
+              "minimum": 1,
+              "maximum": 20
+            }
+          }
+        }
       }
     ]
   },
