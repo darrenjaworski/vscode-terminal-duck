@@ -58,6 +58,16 @@
         "title": "Terminal Duck: Clear captured shell history"
       }
     ],
+    "configuration": {
+      "title": "Terminal Duck",
+      "properties": {
+        "terminalDuck.suggestOnFailure": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a subtle status bar item after a non-zero exit in the integrated terminal, offering to ask @duck about the failure. Auto-hides after 60 seconds."
+        }
+      }
+    },
     "languageModelTools": [
       {
         "name": "terminal-duck_getRecentCommands",

@@ -1,10 +1,60 @@
 import * as vscode from 'vscode';
+import { CHAT_QUERY, HIDE_AFTER_MS, failureTooltip, shouldReact } from './failureHint';
 import { CapturedExecution, clampLimit, formatExecutions } from './format';
 import { systemPromptFor } from './prompts';
 
 const MAX_HISTORY = 20;
 const MAX_OUTPUT_BYTES = 8_000;
 const MAX_CONTEXT_EXECUTIONS = 6;
+
+class FailureHint {
+	private readonly statusBarItem: vscode.StatusBarItem;
+	private hideTimer: ReturnType<typeof setTimeout> | undefined;
+
+	constructor() {
+		this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+		this.statusBarItem.name = 'Terminal Duck';
+		this.statusBarItem.text = '$(comment-discussion) Ask Duck?';
+		this.statusBarItem.command = 'terminal-duck.askAboutLastFailure';
+	}
+
+	register(context: vscode.ExtensionContext) {
+		context.subscriptions.push(
+			this.statusBarItem,
+			vscode.window.onDidEndTerminalShellExecution((e) => this.onEnd(e)),
+			vscode.commands.registerCommand('terminal-duck.askAboutLastFailure', () =>
+				this.askAboutLastFailure(),
+			),
+		);
+	}
+
+	private onEnd(e: vscode.TerminalShellExecutionEndEvent) {
+		if (!this.enabled()) return;
+		if (!shouldReact(e.exitCode)) return;
+		this.statusBarItem.tooltip = failureTooltip(e.execution.commandLine.value, e.exitCode);
+		this.statusBarItem.show();
+		if (this.hideTimer) clearTimeout(this.hideTimer);
+		this.hideTimer = setTimeout(() => this.statusBarItem.hide(), HIDE_AFTER_MS);
+	}
+
+	private enabled(): boolean {
+		return vscode.workspace.getConfiguration('terminalDuck').get<boolean>('suggestOnFailure', true);
+	}
+
+	private async askAboutLastFailure(): Promise<void> {
+		this.statusBarItem.hide();
+		if (this.hideTimer) clearTimeout(this.hideTimer);
+		try {
+			await vscode.commands.executeCommand('workbench.action.chat.open', {
+				query: CHAT_QUERY,
+			});
+		} catch {
+			vscode.window.showInformationMessage(
+				'Terminal Duck: install GitHub Copilot Chat to ask @duck.',
+			);
+		}
+	}
+}
 
 class ShellHistory {
 	private readonly buffer: CapturedExecution[] = [];
@@ -112,6 +162,9 @@ async function handleChat(
 export function activate(context: vscode.ExtensionContext) {
 	const history = new ShellHistory();
 	history.register(context);
+
+	const failureHint = new FailureHint();
+	failureHint.register(context);
 
 	const participant = vscode.chat.createChatParticipant(
 		'terminal-duck.duck',
