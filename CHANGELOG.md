@@ -6,9 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-04-19
+
 ### Added
 
 - Release workflow (`.github/workflows/release.yml`) that, on any `v*` tag push, runs the full kitchen-sink, verifies the tag matches `package.json`'s version, extracts the matching CHANGELOG section, and creates a GitHub Release with the `.vsix` attached. Tags containing `-` are marked as prereleases.
+- Extension icon (`images/icon.png`) combining a terminal window and duck, wired up via the `icon` field in `package.json` so the Marketplace listing and chat participant show branding.
 
 ## [1.0.0] - 2026-04-19
 
