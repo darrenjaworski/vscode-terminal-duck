@@ -41,6 +41,12 @@ Example prompts:
 | `@duck /rerun`   | Suggests the next command to run — retry with different flags, or the natural follow-up step. |
 | `@duck /explain` | Explains what the most recent command did and what its output means.                          |
 
+## Failure nudge
+
+When a terminal command exits non-zero, Terminal Duck pops a subtle **"Ask Duck?"** entry into the right side of the status bar for ~60 seconds. Click it and Copilot Chat opens pre-filled with `@duck /explain` and a question about the failure — no copy-paste, no remembering the participant exists.
+
+If you'd rather not see it, set `terminalDuck.suggestOnFailure` to `false` (see [Settings](#settings)).
+
 ## Use from other agents (Language Model Tool)
 
 Terminal Duck also registers a `#duck` tool via the `lm.tools` API. Any chat participant or Copilot agent-mode session can call it to fetch your recent terminal activity.
@@ -58,6 +64,24 @@ Agents can invoke `terminal-duck_getRecentCommands` programmatically; accepts an
 | Command                                       | Description                         |
 | --------------------------------------------- | ----------------------------------- |
 | `Terminal Duck: Clear captured shell history` | Wipes the in-memory command buffer. |
+
+## Settings
+
+| Setting                         | Default | Description                                                                                                         |
+| ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------- |
+| `terminalDuck.suggestOnFailure` | `true`  | Show the "Ask Duck?" status bar item after a non-zero exit in the integrated terminal. Auto-hides after 60 seconds. |
+
+## Troubleshooting
+
+**`@duck` says "no commands captured" right after I ran something.** Terminal Duck only sees commands that fire VS Code's shell-integration events. Quick checks:
+
+- Open the integrated terminal and look for the small command decorations in the gutter (a chevron next to each prompt). If they're missing, shell integration isn't active for this terminal.
+- Make sure your shell is one VS Code recognises (bash, zsh, fish, pwsh) and that you're using a recent VS Code release. See [VS Code's shell integration docs](https://code.visualstudio.com/docs/terminal/shell-integration) for manual setup if your shell isn't auto-detected.
+- Reopen the terminal after enabling integration — already-running terminals don't retroactively gain it.
+
+**`@duck` replies that no language model is available.** Terminal Duck routes through Copilot's `vscode.lm` API. Confirm GitHub Copilot Chat is installed, signed in, and your account has Copilot access.
+
+**Output looks truncated.** Each captured command is bounded at ~8 KB so the LLM context stays tight. The last 20 commands are kept.
 
 ## Caveats
 
