@@ -6,6 +6,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-04-22
+
+### Fixed
+
+- Exclude `CLAUDE.md` from the packaged `.vsix` so internal contributor guidance is not shipped to end users.
+
 ## [1.1.0] - 2026-04-19
 
 ### Added

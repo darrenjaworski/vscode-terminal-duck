@@ -13,6 +13,7 @@ src/**
 **/*.map
 **/*.test.ts
 IDEAS.md
+CLAUDE.md
 *.vsix
 coverage/**
 vitest.config.*
