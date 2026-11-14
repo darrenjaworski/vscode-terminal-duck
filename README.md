@@ -1,5 +1,8 @@
 # Terminal Duck
 
+[![CI](https://github.com/darrenjaworski/vscode-terminal-duck/actions/workflows/ci.yml/badge.svg)](https://github.com/darrenjaworski/vscode-terminal-duck/actions/workflows/ci.yml)
+[![Release](https://github.com/darrenjaworski/vscode-terminal-duck/actions/workflows/release.yml/badge.svg)](https://github.com/darrenjaworski/vscode-terminal-duck/actions/workflows/release.yml)
+
 A runtime-aware rubber duck for VS Code. `@duck` is a chat participant that sees the commands you actually ran in the integrated terminal — with their exit codes and output — and grounds its answers in that history instead of making you copy-paste.
 
 ## How it works
