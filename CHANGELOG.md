@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-11-14
+
+### Changed
+
+- Update dependencies: ESLint 10, TypeScript 6, Vitest 4, Prettier 3.10, @vscode/vsce 4.
+- CI and release workflows now run on Node 24 LTS (`.nvmrc`), and CI packages the `.vsix` on every push.
+
 ## [1.1.1] - 2026-04-22
 
 ### Fixed
